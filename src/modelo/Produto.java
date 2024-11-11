@@ -7,6 +7,8 @@ public class Produto {
     private Integer quantidadeEstoque;
     private String categoria;
 
+    public Produto() { }
+
     public Produto(String nome, Double preco, Integer quantidadeEstoque, String categoria) {
         this.nome = nome;
         this.preco = preco;
@@ -79,6 +81,4 @@ public class Produto {
                 ", Categoria: '" + categoria + '\'' +
                 '}';
     }
-
-
 }
