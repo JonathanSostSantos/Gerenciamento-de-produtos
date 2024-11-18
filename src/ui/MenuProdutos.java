@@ -18,55 +18,68 @@ public class MenuProdutos {
 
     public void exibirMenu() {
         Integer valorInserido;
-        System.out.println("O que deseja fazer?\n\n" +
-                "1. Cadastrar Produto\n" +
-                "2. Buscar Produto por ID\n" +
-                "3. Listar Todos os Produtos\n" +
-                "4. Atualizar Produto\n" +
-                "5. Deletar Produto\n" +
-                "6. Buscar por Nome\n" +
-                "7. Buscar por Categoria\n" +
-                "8. Sair");
 
-        valorInserido = lerEntradaInteira(scanner.next());
+        while(true) {
+            System.out.println("O que deseja fazer?\n\n" +
+                    "1. Cadastrar Produto\n" +
+                    "2. Buscar Produto por ID\n" +
+                    "3. Listar Todos os Produtos\n" +
+                    "4. Atualizar Produto\n" +
+                    "5. Deletar Produto\n" +
+                    "6. Buscar por Nome\n" +
+                    "7. Buscar por Categoria\n" +
+                    "8. Sair");
 
-        switch(valorInserido) {
-            case 1:
-                cadastrarProduto();
-                break;
-            case 2:
-                buscarProduto();
-                break;
-            case 3:
-                listarProdutos();
-                break;
-            case 4:
-                atualizarProduto();
-                break;
-            case 5:
-                deletarProduto();
-                break;
-            case 6:
-                buscarPorNome();
-                break;
-            case 7:
-                buscarPorCategoria();
-                break;
-            default:
-                break;
+            valorInserido = lerEntradaInteira(scanner.next().trim());
+
+            if (valorInserido != null) {
+                switch(valorInserido) {
+                    case 1:
+                        cadastrarProduto();
+                        break;
+                    case 2:
+                        buscarProduto();
+                        break;
+                    case 3:
+                        listarProdutos();
+                        break;
+                    case 4:
+                        atualizarProduto();
+                        break;
+                    case 5:
+                        deletarProduto();
+                        break;
+                    case 6:
+                        buscarPorNome();
+                        break;
+                    case 7:
+                        buscarPorCategoria();
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
     }
 
-    private Produto solicitarDados(Integer tipoOperacao) {
+    private Produto solicitarDados(Integer tipoOperacao, Integer idProduto) {
         String valorInserido;
         String nome;
         Double preco;
         Integer quantidadeEstoque;
         String categoria;
+        Produto produtoASerAtualizado = new Produto();
+
+        if (tipoOperacao == 2) {
+            produtoASerAtualizado = gerenciador.buscarPorId(idProduto);
+        }
 
         while (true) {
-            System.out.println("Informe o nome do produto: ");
-            valorInserido = scanner.next();
+            if (tipoOperacao == 2) {
+                System.out.println("Nome atual do produto: " + produtoASerAtualizado.getNome());
+            }
+            System.out.printf("Informe o%s nome do produto: %n", " novo");
+            valorInserido = scanner.next().trim();
             if ((valorInserido.isBlank() && tipoOperacao == 1) || valorInserido.length() < 2) {
                 System.out.println("O nome do produto é inválido. Tente novamente.\n");
             } else {
@@ -77,8 +90,7 @@ public class MenuProdutos {
 
         while (true) {
             System.out.println("Informe o preço do produto: R$");
-            valorInserido = scanner.next();
-            preco = lerEntradaDouble(valorInserido);
+            preco = lerEntradaDouble(scanner.next());
             if (preco <= 0 && preco != null) {
                 System.out.println("O valor inserio deve ser maior do que zero. Tente novamente.");
             } else {
@@ -88,8 +100,7 @@ public class MenuProdutos {
 
         while (true) {
             System.out.println("Informe a quantidade em estoque: ");
-            valorInserido = scanner.next();
-            quantidadeEstoque = lerEntradaInteira(valorInserido);
+            quantidadeEstoque = lerEntradaInteira(scanner.next());
             if (quantidadeEstoque < 0 && quantidadeEstoque != null) {
                 System.out.println("A quantidade em estoque não pode ser negativa. Tente inserir outra quantidade.");
             } else {
@@ -111,19 +122,26 @@ public class MenuProdutos {
         return new Produto(nome, preco, quantidadeEstoque, categoria);
     }
 
+    private Produto solicitarDados(Integer tipoOperacao) {
+        return solicitarDados(tipoOperacao, 0);
+    }
+
     private void cadastrarProduto() {
         gerenciador.criar(solicitarDados(1));
     }
 
     private void buscarProduto() {
+        Integer intInformado;
         System.out.println("Informe o ID a ser pesquisado: ");
-        System.out.println(gerenciador.buscarPorId(scanner.nextInt()));
-        scanner.next();
-        System.out.println("Deseja procurar outro produto? S/N");
-        if (scanner.next().equalsIgnoreCase("S")) {
-            buscarProduto();
-        } else {
-            System.out.println("Voltando ao menu principal.");
+        intInformado = lerEntradaInteira(scanner.next());
+        if (intInformado != null) {
+            System.out.println(gerenciador.buscarPorId(intInformado));
+            System.out.println("Deseja procurar outro produto? S/N");
+            if (scanner.next().equalsIgnoreCase("S")) {
+                buscarProduto();
+            } else {
+                System.out.println("Voltando ao menu principal.");
+            }
         }
     }
 
@@ -132,37 +150,44 @@ public class MenuProdutos {
         if (produtos.isEmpty()) {
             System.out.println("Sem produtos cadastrados.");
         } else {
+            System.out.println("====Produtos====\n");
+
             for (Produto p : produtos) {
                 System.out.println(p.toString());
             }
+            System.out.println();
         }
     }
 
     private void atualizarProduto() {
         Integer intInformado;
+        Produto novoProduto;
         System.out.println("Informe o ID do produto a ser atualizado: ");
-        intInformado = scanner.nextInt();
-        scanner.next();
-        if (gerenciador.buscarPorId(intInformado) == null) {
-            System.out.println("O produto com o ID informado não existe.");
-        } else {
-            gerenciador.atualizar(solicitarDados(2));
-            System.out.println("Produto atualizado com sucesso!");
+        intInformado = lerEntradaInteira(scanner.next());
+        if (intInformado != null) {
+            if (gerenciador.buscarPorId(intInformado) == null) {
+                System.out.println("O produto com o ID informado não existe.");
+            } else {
+                novoProduto = solicitarDados(2, intInformado);
+                gerenciador.atualizar(novoProduto);
+                System.out.println("Produto atualizado com sucesso!");
+            }
         }
     }
 
     private void deletarProduto() {
         Integer intInformado;
         System.out.println("Informe o ID do produto a ser deletado: ");
-        intInformado = scanner.nextInt();
-        scanner.next();
-        if (gerenciador.buscarPorId(intInformado) == null) {
-            System.out.println("O produto com o ID informado não existe.");
-        } else {
-            if (gerenciador.deletar(intInformado)) {
-                System.out.println("Produto deletado com sucesso!");
+        intInformado = lerEntradaInteira(scanner.next());
+        if (intInformado != null) {
+            if (gerenciador.buscarPorId(intInformado) == null) {
+                System.out.println("O produto com o ID informado não existe.");
             } else {
-                System.out.println("Não foi possível deletar o produto.");
+                if (gerenciador.deletar(intInformado)) {
+                    System.out.println("Produto deletado com sucesso!");
+                } else {
+                    System.out.println("Não foi possível deletar o produto.");
+                }
             }
         }
     }
@@ -171,7 +196,7 @@ public class MenuProdutos {
         String valorInserido;
         List<Produto> produtos;
         System.out.println("Informe o nome dos produtos a serem pesquisados: ");
-        valorInserido = scanner.next();
+        valorInserido = scanner.next().trim();
         if (valorInserido.length() < 2) {
             System.out.println("O nome do produto deve conter no mínimo 2 caracteres.");
         } else {
@@ -179,6 +204,8 @@ public class MenuProdutos {
             if (produtos.isEmpty()) {
                 System.out.println("Não há produtos cadastrados com este nome.");
             } else {
+                System.out.println("====Produtos====\n");
+
                 for (Produto p : produtos) {
                     System.out.println(p.toString());
                 }
@@ -190,7 +217,7 @@ public class MenuProdutos {
         String valorInserido;
         List<Produto> produtos;
         System.out.println("Informe a categoria dos produtos a serem pesquisados: ");
-        valorInserido = scanner.next();
+        valorInserido = scanner.next().trim();
         if (valorInserido.isBlank()) {
             System.out.println("A categoria do produto não pode ser vazia.");
         } else {
@@ -198,6 +225,8 @@ public class MenuProdutos {
             if (produtos.isEmpty()) {
                 System.out.println("Não há produtos cadastrados com esta categoria.");
             } else {
+                System.out.println("====Produtos====\n");
+
                 for (Produto p : produtos) {
                     System.out.println(p.toString());
                 }
