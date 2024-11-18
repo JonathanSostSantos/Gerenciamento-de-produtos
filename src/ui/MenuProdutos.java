@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Scanner;
 
 public class MenuProdutos {
-    private Scanner scanner;
-    private GerenciadorProdutos gerenciador;
+    private final Scanner scanner;
+    private final GerenciadorProdutos gerenciador;
 
     public MenuProdutos() {
         this.scanner = new Scanner(System.in);
@@ -17,8 +17,43 @@ public class MenuProdutos {
     }
 
     public void exibirMenu() {
-        while(true) {
-            System.out.println("");
+        Integer valorInserido;
+        System.out.println("O que deseja fazer?\n\n" +
+                "1. Cadastrar Produto\n" +
+                "2. Buscar Produto por ID\n" +
+                "3. Listar Todos os Produtos\n" +
+                "4. Atualizar Produto\n" +
+                "5. Deletar Produto\n" +
+                "6. Buscar por Nome\n" +
+                "7. Buscar por Categoria\n" +
+                "8. Sair");
+
+        valorInserido = lerEntradaInteira(scanner.next());
+
+        switch(valorInserido) {
+            case 1:
+                cadastrarProduto();
+                break;
+            case 2:
+                buscarProduto();
+                break;
+            case 3:
+                listarProdutos();
+                break;
+            case 4:
+                atualizarProduto();
+                break;
+            case 5:
+                deletarProduto();
+                break;
+            case 6:
+                buscarPorNome();
+                break;
+            case 7:
+                buscarPorCategoria();
+                break;
+            default:
+                break;
         }
     }
 
@@ -40,10 +75,10 @@ public class MenuProdutos {
             }
         }
 
-        while(true) {
+        while (true) {
             System.out.println("Informe o preço do produto: R$");
             valorInserido = scanner.next();
-            preco = validarDouble(valorInserido);
+            preco = lerEntradaDouble(valorInserido);
             if (preco <= 0 && preco != null) {
                 System.out.println("O valor inserio deve ser maior do que zero. Tente novamente.");
             } else {
@@ -54,7 +89,7 @@ public class MenuProdutos {
         while (true) {
             System.out.println("Informe a quantidade em estoque: ");
             valorInserido = scanner.next();
-            quantidadeEstoque = validarInt(valorInserido);
+            quantidadeEstoque = lerEntradaInteira(valorInserido);
             if (quantidadeEstoque < 0 && quantidadeEstoque != null) {
                 System.out.println("A quantidade em estoque não pode ser negativa. Tente inserir outra quantidade.");
             } else {
@@ -62,7 +97,7 @@ public class MenuProdutos {
             }
         }
 
-        while(true) {
+        while (true) {
             System.out.println("Informe a categoria do produto: ");
             valorInserido = scanner.next();
             if (valorInserido.isBlank() && tipoOperacao == 1) {
@@ -88,7 +123,7 @@ public class MenuProdutos {
         if (scanner.next().equalsIgnoreCase("S")) {
             buscarProduto();
         } else {
-            System.out.println("Voltando para o menu principal.");
+            System.out.println("Voltando ao menu principal.");
         }
     }
 
@@ -97,7 +132,7 @@ public class MenuProdutos {
         if (produtos.isEmpty()) {
             System.out.println("Sem produtos cadastrados.");
         } else {
-            for(Produto p : produtos) {
+            for (Produto p : produtos) {
                 System.out.println(p.toString());
             }
         }
@@ -135,7 +170,7 @@ public class MenuProdutos {
     private void buscarPorNome() {
         String valorInserido;
         List<Produto> produtos;
-        System.out.println("Informe o nome do produto a ser pesquisado: ");
+        System.out.println("Informe o nome dos produtos a serem pesquisados: ");
         valorInserido = scanner.next();
         if (valorInserido.length() < 2) {
             System.out.println("O nome do produto deve conter no mínimo 2 caracteres.");
@@ -151,7 +186,26 @@ public class MenuProdutos {
         }
     }
 
-    private Integer validarInt(String value) {
+    private void buscarPorCategoria() {
+        String valorInserido;
+        List<Produto> produtos;
+        System.out.println("Informe a categoria dos produtos a serem pesquisados: ");
+        valorInserido = scanner.next();
+        if (valorInserido.isBlank()) {
+            System.out.println("A categoria do produto não pode ser vazia.");
+        } else {
+            produtos = gerenciador.buscarPorCategoria(valorInserido);
+            if (produtos.isEmpty()) {
+                System.out.println("Não há produtos cadastrados com esta categoria.");
+            } else {
+                for (Produto p : produtos) {
+                    System.out.println(p.toString());
+                }
+            }
+        }
+    }
+
+    private Integer lerEntradaInteira(String value) {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
@@ -160,7 +214,7 @@ public class MenuProdutos {
         }
     }
 
-    private Double validarDouble(String value) {
+    private Double lerEntradaDouble(String value) {
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException e) {
