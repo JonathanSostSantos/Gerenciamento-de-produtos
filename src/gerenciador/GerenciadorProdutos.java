@@ -10,9 +10,15 @@ public class GerenciadorProdutos {
     private List<Produto> produtos;
     private Integer proximoId;
 
+    public GerenciadorProdutos() {
+        this.produtos = new ArrayList<>();
+        proximoId = 1;
+    }
+
     public void criar(Produto produto) {
         produto.setId(proximoId);
         produtos.add(produto);
+        proximoId++;
     }
 
     public Produto buscarPorId(int id) {
@@ -26,16 +32,30 @@ public class GerenciadorProdutos {
     }
 
     public List<Produto> listarTodos() {
-        List<Produto> produtosARetornar = produtos;
-        return produtosARetornar;
+        return produtos;
     }
 
     public boolean atualizar(Produto produto) {
         Optional<Produto> produtoASerAtualizado = produtos.stream().filter(prod -> prod.getId().equals(produto.getId())).findFirst();
 
-        if (produtoASerAtualizado != null) {
-            produtos.set(produtos.indexOf(produtoASerAtualizado), produto);
-            return true;
+        for (Produto p : produtos) {
+            if (produto.getId().equals(p.getId())) {
+                if (!produto.getNome().isBlank()) {
+                    p.setNome(p.getNome());
+                }
+                if (!produto.getPreco().isNaN()) {
+                    p.setPreco(produto.getPreco());
+                }
+                if (!produto.getCategoria().isBlank()) {
+                    p.setCategoria(produto.getCategoria());
+                }
+                if (!produto.getQuantidadeEstoque().equals(-1)) {
+                    p.setQuantidadeEstoque(produto.getQuantidadeEstoque());
+                }
+
+                //produtos.set(produtos.indexOf(p), p);
+                return true;
+            }
         }
 
         return false;
@@ -74,17 +94,5 @@ public class GerenciadorProdutos {
         }
 
         return produtosParaRetornar;
-    }
-
-    private void validarProduto(Produto produto) {
-        if (produto.getNome().isEmpty()) {
-            System.out.println("O nome do produto não pode ser vazio.");
-        }
-        if (produto.getPreco() < 0) {
-            System.out.println("O valor do produto não pode ser negativo.");
-        }
-        if (produto.getQuantidadeEstoque() < 0) {
-            System.out.println("A quantidade do produto não pode ser menor do que zero.");
-        }
     }
 }
