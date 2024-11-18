@@ -36,12 +36,10 @@ public class GerenciadorProdutos {
     }
 
     public boolean atualizar(Produto produto) {
-        Optional<Produto> produtoASerAtualizado = produtos.stream().filter(prod -> prod.getId().equals(produto.getId())).findFirst();
-
         for (Produto p : produtos) {
             if (produto.getId().equals(p.getId())) {
                 if (!produto.getNome().isBlank()) {
-                    p.setNome(p.getNome());
+                    p.setNome(produto.getNome());
                 }
                 if (!produto.getPreco().isNaN()) {
                     p.setPreco(produto.getPreco());
@@ -53,7 +51,7 @@ public class GerenciadorProdutos {
                     p.setQuantidadeEstoque(produto.getQuantidadeEstoque());
                 }
 
-                //produtos.set(produtos.indexOf(p), p);
+                System.out.println("Produto atualizado com sucesso! Resultado: " + p);
                 return true;
             }
         }
